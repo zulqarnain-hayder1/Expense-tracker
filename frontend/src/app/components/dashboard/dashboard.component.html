@@ -1,0 +1,220 @@
+<div class="dashboard-layout">
+  <!-- Top Navigation / Header -->
+  <header class="dashboard-header glass-card">
+    <div class="header-brand">
+      <div class="logo-circle animate-pulse">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="wallet-svg"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
+      </div>
+      <div class="brand-text">
+        <h1>Tracker</h1>
+        <span class="badge badge-indigo">FinTech</span>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <span class="user-greeting">Welcome, <strong>{{ username }}</strong></span>
+      
+      <!-- Seed Mock Data Button -->
+      <button (click)="seedMockData()" class="btn btn-outline btn-sm" [disabled]="isSeeding" title="Seed realistic mock database transactions">
+        <i class="fa-solid fa-database" [style.margin-right.px]="4"></i>
+        <span>Seed Mock Data</span>
+      </button>
+
+      <button (click)="openAddModal()" class="btn btn-indigo btn-glow btn-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>Add Transaction</span>
+      </button>
+
+      <button (click)="logout()" class="btn btn-outline btn-sm btn-icon" title="Logout">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main container">
+    
+    <!-- Stats Cards Grid -->
+    <section class="stats-grid">
+      <!-- Balance Card -->
+      <div class="glass-card stat-card border-left-indigo animate-slide-up-1">
+        <div class="stat-icon bg-indigo-light text-indigo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Net Balance</span>
+          <h2 class="stat-value" [ngClass]="{'text-emerald': summary.net_balance >= 0, 'text-rose': summary.net_balance < 0}">
+            {{ summary.net_balance | currency:'USD':'symbol':'1.2-2' }}
+          </h2>
+        </div>
+      </div>
+
+      <!-- Income Card -->
+      <div class="glass-card stat-card border-left-emerald animate-slide-up-2">
+        <div class="stat-icon bg-emerald-light text-emerald">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total Income</span>
+          <h2 class="stat-value text-emerald">
+            {{ summary.total_income | currency:'USD':'symbol':'1.2-2' }}
+          </h2>
+        </div>
+      </div>
+
+      <!-- Expense Card -->
+      <div class="glass-card stat-card border-left-rose animate-slide-up-3">
+        <div class="stat-icon bg-rose-light text-rose">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total Expenses</span>
+          <h2 class="stat-value text-rose">
+            {{ summary.total_expense | currency:'USD':'symbol':'1.2-2' }}
+          </h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREMIUM CHART GRID SECTION -->
+    <section class="chart-grid">
+      <!-- Cash Flow Overview Bar Chart -->
+      <div class="glass-card chart-card animate-fade-in">
+        <div class="chart-header">
+          <h3>Cash Flow Overview</h3>
+          <span class="badge badge-indigo">Income vs Expense</span>
+        </div>
+        <div class="chart-wrapper">
+          <div *ngIf="summary.total_income === 0 && summary.total_expense === 0" class="empty-state">
+            <div class="empty-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <p>No transactions recorded yet.</p>
+          </div>
+          <canvas id="trendChart" [style.display]="summary.total_income > 0 || summary.total_expense > 0 ? 'block' : 'none'"></canvas>
+        </div>
+      </div>
+
+      <!-- Category Breakdown Doughnut Chart -->
+      <div class="glass-card chart-card animate-fade-in">
+        <div class="chart-header">
+          <h3>Expense Distribution</h3>
+          <span class="badge badge-rose">By Category</span>
+        </div>
+        <div class="chart-wrapper doughnut-wrapper">
+          <div *ngIf="summary.category_breakdown.length === 0" class="empty-state">
+            <div class="empty-icon"><i class="fa-solid fa-chart-pie"></i></div>
+            <p>No statistics. Seed data to view.</p>
+          </div>
+          <canvas id="categoryChart" [style.display]="summary.category_breakdown.length > 0 ? 'block' : 'none'"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analytics Dashboard Layout -->
+    <div class="analytics-layout">
+      <!-- Recent Transactions List -->
+      <div class="glass-card analytic-panel animate-fade-in">
+        <div class="panel-header">
+          <h3>Recent Transactions</h3>
+          <button (click)="openAddModal()" class="btn btn-link btn-sm">Add New</button>
+        </div>
+        
+        <div class="panel-body">
+          <div *ngIf="isLoading" class="loader-container">
+            <span class="spinner spinner-indigo"></span>
+          </div>
+          
+          <div *ngIf="!isLoading && recentTransactions.length === 0" class="empty-state">
+            <div class="empty-icon"><i class="fa-solid fa-list-check"></i></div>
+            <p>No recent transactions found.</p>
+          </div>
+          
+          <div *ngIf="!isLoading && recentTransactions.length > 0" class="recent-list">
+            <div *ngFor="let item of recentTransactions" class="recent-item">
+              <div class="item-icon-wrapper" [ngClass]="{'bg-emerald-light text-emerald': item.type === 'income', 'bg-rose-light text-rose': item.type === 'expense'}">
+                <svg *ngIf="item.type === 'income'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                <svg *ngIf="item.type === 'expense'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+              </div>
+              
+              <div class="item-details">
+                <span class="item-title">{{ item.title }}</span>
+                <span class="item-meta">{{ item.category }} • {{ item.date | date:'mediumDate' }}</span>
+              </div>
+              
+              <div class="item-action-wrapper">
+                <span class="item-amount" [ngClass]="{'text-emerald': item.type === 'income', 'text-rose': item.type === 'expense'}">
+                  {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency:'USD':'symbol':'1.2-2' }}
+                </span>
+                
+                <div class="item-buttons">
+                  <button (click)="openEditModal(item)" class="btn-icon-sm text-indigo" title="Edit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+                  </button>
+                  <button (click)="onDeleteTransaction(item.id!)" class="btn-icon-sm text-rose" title="Delete">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Breakdown Progress -->
+      <div class="glass-card analytic-panel animate-fade-in">
+        <div class="panel-header">
+          <h3>Category Distribution</h3>
+          <span class="badge badge-indigo">All Time</span>
+        </div>
+        
+        <div class="panel-body">
+          <div *ngIf="isLoading" class="loader-container">
+            <span class="spinner spinner-indigo"></span>
+          </div>
+          <div *ngIf="!isLoading && summary.category_breakdown.length === 0" class="empty-state">
+            <div class="empty-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <p>No category statistics available.</p>
+          </div>
+          
+          <div *ngIf="!isLoading && summary.category_breakdown.length > 0" class="category-list">
+            <div *ngFor="let cat of summary.category_breakdown" class="category-progress-item">
+              <div class="cat-label-row">
+                <span class="cat-name">
+                  <span class="cat-bullet" [style.background-color]="categoryColors[cat.category] || '#adb5bd'"></span>
+                  {{ cat.category }}
+                  <span class="cat-type-badge" [ngClass]="cat.type === 'income' ? 'badge-emerald' : 'badge-rose'">{{ cat.type }}</span>
+                </span>
+                <span class="cat-amount">
+                  {{ cat.total | currency:'USD':'symbol':'1.2-2' }}
+                  <span class="cat-pct">({{ getCategoryPercentage(cat.total, cat.type) }}%)</span>
+                </span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" 
+                     [style.width.%]="getCategoryPercentage(cat.total, cat.type)"
+                     [style.background-color]="categoryColors[cat.category] || '#adb5bd'"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Integrated Full Transactions List & Filter View -->
+    <section class="full-transactions-section">
+      <app-transaction-list 
+        (editRequested)="openEditModal($event)" 
+        (deleteRequested)="onDeleteTransaction($event)"
+        (filterChanged)="loadDashboardData()">
+      </app-transaction-list>
+    </section>
+
+  </main>
+
+  <!-- Interactive Add/Edit Form Modal -->
+  <app-transaction-form 
+    *ngIf="isFormOpen" 
+    [transaction]="selectedTransaction" 
+    (saved)="onTransactionSaved()" 
+    (closed)="closeFormModal()">
+  </app-transaction-form>
+</div>

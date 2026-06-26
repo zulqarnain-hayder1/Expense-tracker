@@ -1,0 +1,162 @@
+<div class="glass-card transaction-list-card animate-fade-in">
+  <div class="list-header">
+    <div class="header-titles">
+      <h3>Transaction Ledger</h3>
+      <p class="subtitle">Search, filter, and export your entire financial history</p>
+    </div>
+    
+    <div class="action-buttons-group">
+      <!-- Import JSON (Hidden input triggered by button) -->
+      <label class="btn btn-outline btn-sm btn-icon" title="Import from JSON">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        <span>Import</span>
+        <input type="file" accept=".json" (change)="onFileSelected($event)" style="display: none;" />
+      </label>
+
+      <!-- Export JSON -->
+      <button (click)="exportData()" class="btn btn-outline btn-sm btn-icon" title="Export to JSON" [disabled]="transactions.length === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <span>Export</span>
+      </button>
+
+      <!-- Reset -->
+      <button (click)="resetFilters()" class="btn btn-outline btn-sm" title="Clear All Filters">Reset</button>
+    </div>
+  </div>
+
+  <!-- Advanced Filtering Bar -->
+  <div class="filter-panel">
+    <div class="filter-row">
+      <!-- Search Input -->
+      <div class="filter-group flex-2">
+        <label for="search-input">Search Title</label>
+        <div class="search-input-wrapper">
+          <input 
+            type="text" 
+            id="search-input" 
+            [(ngModel)]="search" 
+            (ngModelChange)="onFilterChange()" 
+            placeholder="Search by keywords..."
+            class="form-control"
+          />
+        </div>
+      </div>
+
+      <!-- Type Dropdown -->
+      <div class="filter-group col">
+        <label for="type-select">Type</label>
+        <select id="type-select" [(ngModel)]="type" (change)="onFilterChange()" class="form-control select-control">
+          <option value="">All Types</option>
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+      </div>
+
+      <!-- Category Dropdown -->
+      <div class="filter-group col">
+        <label for="cat-select">Category</label>
+        <select id="cat-select" [(ngModel)]="category" (change)="onFilterChange()" class="form-control select-control">
+          <option value="">All Categories</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <!-- Sorting -->
+      <div class="filter-group col">
+        <label for="sort-select">Sort By</label>
+        <select id="sort-select" [(ngModel)]="sortBy" (change)="onFilterChange()" class="form-control select-control">
+          <option value="date_desc">Date (Newest)</option>
+          <option value="date_asc">Date (Oldest)</option>
+          <option value="amount_desc">Amount (Highest)</option>
+          <option value="amount_asc">Amount (Lowest)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Date Filters -->
+    <div class="filter-row-secondary">
+      <div class="date-filter-group">
+        <div class="filter-group">
+          <label for="start-date">From</label>
+          <input 
+            type="date" 
+            id="start-date" 
+            [(ngModel)]="startDate" 
+            (change)="onFilterChange()" 
+            class="form-control date-control-sm"
+          />
+        </div>
+        <div class="filter-group">
+          <label for="end-date">To</label>
+          <input 
+            type="date" 
+            id="end-date" 
+            [(ngModel)]="endDate" 
+            (change)="onFilterChange()" 
+            class="form-control date-control-sm"
+          />
+        </div>
+      </div>
+      <span class="results-count" *ngIf="!isLoading">Showing {{ transactions.length }} entries</span>
+    </div>
+  </div>
+
+  <!-- Data Display Ledger -->
+  <div class="list-body">
+    <div *ngIf="isLoading" class="loader-container">
+      <span class="spinner spinner-indigo"></span>
+    </div>
+
+    <div *ngIf="!isLoading && transactions.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+      </div>
+      <h4>No Transactions Found</h4>
+      <p>Try refining your search keyword or clearing the filters.</p>
+    </div>
+
+    <!-- Table Ledger for desktop/tablets -->
+    <div class="table-responsive" *ngIf="!isLoading && transactions.length > 0">
+      <table class="ledger-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th class="text-right">Amount</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of transactions" class="ledger-row">
+            <td class="cell-date" data-label="Date">{{ item.date | date:'mediumDate' }}</td>
+            <td class="cell-title" data-label="Transaction">
+              <span class="title-text">{{ item.title }}</span>
+              <span class="desc-text" *ngIf="item.description">{{ item.description }}</span>
+            </td>
+            <td class="cell-category" data-label="Category">
+              <span class="badge badge-outline-indigo">{{ item.category }}</span>
+            </td>
+            <td class="cell-type" data-label="Type">
+              <span class="badge" [ngClass]="item.type === 'income' ? 'badge-emerald' : 'badge-rose'">{{ item.type }}</span>
+            </td>
+            <td class="cell-amount text-right" data-label="Amount" [ngClass]="item.type === 'income' ? 'text-emerald' : 'text-rose'">
+              <strong>{{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency:'USD':'symbol':'1.2-2' }}</strong>
+            </td>
+            <td class="cell-actions text-right" data-label="Actions">
+              <div class="row-actions">
+                <button (click)="editItem(item)" class="btn-icon text-indigo" title="Edit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+                </button>
+                <button (click)="deleteItem(item.id!)" class="btn-icon text-rose" title="Delete">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

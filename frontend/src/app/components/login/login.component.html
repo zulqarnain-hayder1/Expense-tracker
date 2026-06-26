@@ -1,0 +1,116 @@
+<div class="login-page">
+  <!-- Left Side: Ambient Art Column -->
+  <div class="login-art">
+    <div class="circle-blur-1"></div>
+    <div class="circle-blur-2"></div>
+    
+    <div class="login-art-content animate-fade-in">
+      <div class="art-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px; color: #818cf8;"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
+        <h2>Tracker</h2>
+        <span class="art-badge">v1.2</span>
+      </div>
+      
+      <h1>Take Control of Your Personal Finances</h1>
+      <p>Gain deeper insights into your cash flow, analyze trends with beautiful dashboards, and manage expenses seamlessly in one platform.</p>
+      
+      <div class="art-bullets">
+        <div class="art-bullet-item">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Secure JWT Authentication</span>
+        </div>
+        <div class="art-bullet-item">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Real-time Interactive Charts</span>
+        </div>
+        <div class="art-bullet-item">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Flexible Category Limits & Ledger</span>
+        </div>
+        <div class="art-bullet-item">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>PostgreSQL Integrated Database</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Interactive Login Form -->
+  <div class="login-container">
+    <div class="glass-card login-card animate-scale-up">
+      <div class="card-header">
+        <div class="logo-icon animate-pulse">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; color: var(--indigo-main);"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2v2h4v-4h-2z"></path><circle cx="10" cy="14" r="1.5" fill="currentColor"></circle></svg>
+        </div>
+        <h2>{{ isLoginMode ? 'Welcome Back' : 'Create Account' }}</h2>
+        <p class="subtitle">{{ isLoginMode ? 'Manage your expenses seamlessly' : 'Get started with your personal finance tracker' }}</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              [(ngModel)]="username" 
+              required 
+              placeholder="Enter your username"
+              class="form-control"
+              autocomplete="username"
+            />
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="!isLoginMode">
+          <label for="email">Email Address</label>
+          <div class="input-wrapper">
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              [(ngModel)]="email" 
+              required 
+              placeholder="Enter your email"
+              class="form-control"
+              autocomplete="email"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              [(ngModel)]="password" 
+              required 
+              placeholder="Enter your password"
+              class="form-control"
+              autocomplete="current-password"
+            />
+          </div>
+        </div>
+
+        <div class="error-container" *ngIf="errorMessage">
+          <span class="error-text">{{ errorMessage }}</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg btn-glow" [disabled]="isLoading">
+          <span *ngIf="!isLoading">{{ isLoginMode ? 'Sign In' : 'Sign Up' }}</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+
+        <div class="toggle-mode">
+          <span>{{ isLoginMode ? "Don't have an account?" : 'Already have an account?' }}</span>
+          <button type="button" class="btn-link" (click)="toggleMode()">
+            {{ isLoginMode ? 'Create Account' : 'Sign In' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

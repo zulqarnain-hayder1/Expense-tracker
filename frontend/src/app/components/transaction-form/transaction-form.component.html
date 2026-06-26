@@ -1,0 +1,117 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="glass-card modal-card animate-scale-up" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ transaction ? 'Edit Transaction' : 'New Transaction' }}</h3>
+      <button (click)="close()" class="btn-close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #txForm="ngForm" class="modal-body">
+      <!-- Type Toggle -->
+      <div class="form-group text-center">
+        <label>Transaction Type</label>
+        <div class="type-toggle-wrapper">
+          <button 
+            type="button" 
+            class="toggle-btn toggle-expense" 
+            [class.active]="type === 'expense'"
+            (click)="type = 'expense'">
+            Expense
+          </button>
+          <button 
+            type="button" 
+            class="toggle-btn toggle-income" 
+            [class.active]="type === 'income'"
+            (click)="type = 'income'">
+            Income
+          </button>
+        </div>
+      </div>
+
+      <!-- Title Input -->
+      <div class="form-group">
+        <label for="title">Title *</label>
+        <input 
+          type="text" 
+          id="title" 
+          name="title" 
+          [(ngModel)]="title" 
+          required 
+          placeholder="e.g. Grocery shopping"
+          class="form-control"
+        />
+      </div>
+
+      <!-- Amount and Date in row -->
+      <div class="form-row">
+        <div class="form-group col">
+          <label for="amount">Amount ($) *</label>
+          <input 
+            type="number" 
+            id="amount" 
+            name="amount" 
+            [(ngModel)]="amount" 
+            required 
+            min="0.01" 
+            step="0.01"
+            placeholder="0.00"
+            class="form-control"
+          />
+        </div>
+        
+        <div class="form-group col">
+          <label for="date">Date *</label>
+          <input 
+            type="date" 
+            id="date" 
+            name="date" 
+            [(ngModel)]="date" 
+            required 
+            class="form-control"
+          />
+        </div>
+      </div>
+
+      <!-- Category Dropdown -->
+      <div class="form-group">
+        <label for="category">Category *</label>
+        <select 
+          id="category" 
+          name="category" 
+          [(ngModel)]="category" 
+          required 
+          class="form-control select-control">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <!-- Description Textarea -->
+      <div class="form-group">
+        <label for="description">Description (Optional)</label>
+        <textarea 
+          id="description" 
+          name="description" 
+          [(ngModel)]="description" 
+          placeholder="Add details..."
+          class="form-control textarea-control"
+          rows="3">
+        </textarea>
+      </div>
+
+      <!-- Error message display -->
+      <div class="error-container" *ngIf="errorMessage">
+        <span class="error-text">{{ errorMessage }}</span>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="modal-footer">
+        <button type="button" (click)="close()" class="btn btn-outline" [disabled]="isLoading">Cancel</button>
+        <button type="submit" class="btn btn-indigo btn-glow" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Save</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
