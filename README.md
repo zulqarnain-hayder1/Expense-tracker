@@ -1,6 +1,6 @@
 # Expense Tracker
 
-A full-stack personal finance management app built with **Django REST Framework** and **Angular 17**, featuring JWT authentication, category-based expense tracking, and interactive chart visualizations.
+A full-stack personal finance management app built with **Django REST Framework** and **Angular 17**, featuring JWT authentication, category based expense tracking, and interactive chart visualizations.
 
 ---
 
@@ -23,6 +23,10 @@ A full-stack personal finance management app built with **Django REST Framework*
 - 📅 Month-by-month breakdown
 - 📊 Doughnut chart — expenses by category
 - 💰 Live balance, income & expense summary cards
+---
+
+
+## Project Structure
 
 expense-tracker/
 
@@ -33,7 +37,8 @@ expense-tracker/
 ├── frontend/         # Angular 17 SPA
 
 └── manage.py
----
+
+
 
 ---
 
